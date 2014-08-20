@@ -6,7 +6,6 @@
  * Version: 1.0
  * Author: Nik Dow, CBDWeb
  * Author URI: http://www.cbdweb.net
- * taken from http://justintadlock.com/archives/2009/05/26/the-complete-guide-to-creating-widgets-in-wordpress-28
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
