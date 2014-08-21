@@ -1,0 +1,81 @@
+/*
+*
+*   Styles provided by wordpress for the default calendar widget are suplemented and overridden here
+*
+*/
+
+#wp-calendar div {
+  border-top: none;
+  box-shadow: 2.5px 2.5px 5px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 2.5px 2.5px 5px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 2.5px 2.5px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 19px;
+  z-index: 100;
+  left: 0px;
+  padding: 5px;
+  background: #fff;
+  display:none;
+  width: 300px;
+} 
+
+#wp-calendar td div a {
+    margin-bottom: 5px;
+}
+ 
+#wp-calendar td{
+  position:relative;  
+}
+ 
+#wp-calendar td span{
+  font-size: 16px;
+  font-weight:bold;
+  color: #824328;
+}
+/* Calendar Widget*/
+
+.widget_event_calendar table {
+	line-height: 2;
+	margin: 0;
+}
+
+.widget_event_calendar caption {
+	color: #fff;
+	font-weight: 700;
+	line-height: 1.7142857142;
+	margin-bottom: 18px;
+	text-align: left;
+	text-transform: uppercase;
+}
+
+.widget_event_calendar thead th {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+.widget_event_calendar tbody td,
+.widget_event_calendar thead th {
+	text-align: center;
+}
+
+.widget_event_calendar tbody a {
+	background-color: #24890d;
+	color: #fff;
+	display: block;
+}
+
+.widget_event_calendar tbody a:hover {
+	background-color: #41a62a;
+}
+
+.widget_event_calendar tbody a:hover {
+	color: #fff;
+}
+
+.widget_event_calendar #prev {
+	padding-left: 5px;
+}
+
+.widget_event_calendar #next {
+	padding-right: 5px;
+	text-align: right;
+}

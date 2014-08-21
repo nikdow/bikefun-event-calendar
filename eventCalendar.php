@@ -310,11 +310,6 @@ function load_event_calendar_widget() {
 	register_widget( 'Event_Calendar' );
 }
 
-/**
- * Example Widget class.
- * This class handles everything that needs to be handled with the widget:
- * the settings, form, display, and update.  Nice!
- */
 class Event_Calendar extends WP_Widget {
 
         function __construct() {
@@ -325,6 +320,20 @@ class Event_Calendar extends WP_Widget {
 	function widget( $args, $instance ) {
 		extract($args);
 
+                global $post;
+                if ( $post && ! isset( $_GET['calyear'] ) ) { // show calendar for month of this event
+                    $custom = get_post_custom();
+                    $startd = $custom["tf_events_startdate"][0] + get_option( 'gmt_offset' ) * 3600;
+                    $startyear = date("Y", $startd );
+                    $startmonth = date("m", $startd );
+                    $_GET['calmonth'] = $startmonth;
+                    $_GET['calyear'] = $startyear;
+                    
+                    echo $startmonth;
+                    
+                }
+
+                
 		/** This filter is documented in wp-includes/default-widgets.php */
 		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
 
@@ -353,4 +362,9 @@ class Event_Calendar extends WP_Widget {
 <?php
 	}
 }
+
+function calendar_styles() {
+    wp_enqueue_style('calendar-style', plugins_url( 'style.css', __FILE__ ) );
+}
+add_action( 'wp_enqueue_scripts', 'calendar_styles' );
 
