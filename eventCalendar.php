@@ -328,9 +328,6 @@ class Event_Calendar extends WP_Widget {
                     $startmonth = date("m", $startd );
                     $_GET['calmonth'] = $startmonth;
                     $_GET['calyear'] = $startyear;
-                    
-                    echo $startmonth;
-                    
                 }
 
                 
