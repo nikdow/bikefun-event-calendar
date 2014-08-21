@@ -79,3 +79,7 @@
 	padding-right: 5px;
 	text-align: right;
 }
+
+.widget_event_calendar caption { /* for some reason WP has the caption #FFF, so override this here */
+    color: inherit;
+}
