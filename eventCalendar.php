@@ -121,6 +121,7 @@ function get_event_calendar($initial = true, $echo = true) {
 
 	/* translators: Calendar caption: 1: month name, 2: 4-digit year */
 	$calendar_caption = _x('%1$s %2$s', 'calendar caption');
+        
 	$calendar_output = '<table id="wp-calendar">
 	<caption>' . sprintf($calendar_caption, $wp_locale->get_month($thismonth), date('Y', $unixmonth)) . '</caption>
 	<thead>
@@ -324,10 +325,12 @@ class Event_Calendar extends WP_Widget {
                 if ( $post && ! isset( $_GET['calyear'] ) ) { // show calendar for month of this event
                     $custom = get_post_custom();
                     $startd = $custom["tf_events_startdate"][0] + get_option( 'gmt_offset' ) * 3600;
-                    $startyear = date("Y", $startd );
-                    $startmonth = date("m", $startd );
-                    $_GET['calmonth'] = $startmonth;
-                    $_GET['calyear'] = $startyear;
+                    if( $custom["tf_events_startdate"][0] ) {
+                        $startyear = date("Y", $startd );
+                        $startmonth = date("m", $startd );
+                        $_GET['calmonth'] = $startmonth;
+                        $_GET['calyear'] = $startyear;
+                    }
                 }
 
                 

@@ -59,7 +59,7 @@
 
 .widget_event_calendar tbody a {
 	background-color: #24890d;
-	color: #fff;
+	color: #fff !important;
 	display: block;
 }
 
