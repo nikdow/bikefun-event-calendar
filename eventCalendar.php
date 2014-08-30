@@ -166,53 +166,9 @@ function get_event_calendar($initial = true, $echo = true) {
 
 	<tbody>
 	<tr>';
-/* 
- * local mod 1 - http://shout.setfive.com/2013/07/25/wordpress-modify-native-calendar-widget-for-event-post-types/
- 
-	// Get days with posts
-	$dayswithposts = $wpdb->get_results("SELECT DISTINCT DAYOFMONTH(post_date)
-		FROM $wpdb->posts WHERE post_date >= '{$thisyear}-{$thismonth}-01 00:00:00'
-		AND post_type = 'post' AND post_status = 'publish'
-		AND post_date <= '{$thisyear}-{$thismonth}-{$last_day} 23:59:59'", ARRAY_N);
-	if ( $dayswithposts ) {
-		foreach ( (array) $dayswithposts as $daywith ) {
-			$daywithpost[] = $daywith[0];
-		}
-	} else {
-		$daywithpost = array();
-	}
-
-	if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false || stripos($_SERVER['HTTP_USER_AGENT'], 'camino') !== false || stripos($_SERVER['HTTP_USER_AGENT'], 'safari') !== false)
-		$ak_title_separator = "\n";
-	else
-		$ak_title_separator = ', '; */
-
 	$ak_titles_for_day = array();
         
-        /* local mod 2
-
-	$ak_post_titles = $wpdb->get_results("SELECT ID, post_title, DAYOFMONTH(post_date) as dom "
-		."FROM $wpdb->posts "
-		."WHERE post_date >= '{$thisyear}-{$thismonth}-01 00:00:00' "
-		."AND post_date <= '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' "
-		."AND post_type = 'post' AND post_status = 'publish'"
-	);
-	if ( $ak_post_titles ) {
-		foreach ( (array) $ak_post_titles as $ak_post_title ) {
-
-				/** This filter is documented in wp-includes/post-template.php 
-				$post_title = esc_attr( apply_filters( 'the_title', $ak_post_title->post_title, $ak_post_title->ID ) );
-
-				if ( empty($ak_titles_for_day['day_'.$ak_post_title->dom]) )
-					$ak_titles_for_day['day_'.$ak_post_title->dom] = '';
-				if ( empty($ak_titles_for_day["$ak_post_title->dom"]) ) // first one
-					$ak_titles_for_day["$ak_post_title->dom"] = $post_title;
-				else
-					$ak_titles_for_day["$ak_post_title->dom"] .= $ak_title_separator . $post_title;
-		}
-	} */
-        
-        $dayswithposts = $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%d')) as dom , 
+        $dayswithposts = $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%e')) as dom , 
                     `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
@@ -227,16 +183,17 @@ function get_event_calendar($initial = true, $echo = true) {
 
                     $post_title = esc_attr( apply_filters( 'the_title', $daywith->post_title, $daywith->post_id ) );
 
-                    if(empty($ak_titles_for_day)){
-                                    $ak_titles_for_day[$daywith->dom]= array ();
-                                    $ak_titles_for_day["$daywith->dom"][] = array('title'=>$daywith->post_title,'url'=>get_bloginfo('url') . "?post_type=tf_events&p=".$daywith->ID);
-                            }else{
-                                    $ak_titles_for_day["$daywith->dom"][] = array('title'=>$daywith->post_title,'url'=>get_bloginfo('url') . "?post_type=tf_events&p=".$daywith->ID);
-                                    }
+                    if(empty($ak_titles_for_day[$daywith->dom])){
+                            $ak_titles_for_day[$daywith->dom]= array ();
+                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=tf_events&p=".$daywith->ID);
+                    } else {
+                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=tf_events&p=".$daywith->ID);
+                    }
             }
         } else {
             $daywithpost = array();
         }
+//        echo print_r($ak_titles_for_day);
 
 	// See how much we should pad in the beginning
 	$pad = calendar_week_mod(date('w', $unixmonth)-$week_begins);
@@ -255,7 +212,6 @@ function get_event_calendar($initial = true, $echo = true) {
 			$calendar_output .= '<td>';
 
 		if ( in_array($day, $daywithpost) ){ // any posts today?
-// mod 3				$calendar_output .= '<a href="' . get_day_link( $thisyear, $thismonth, $day ) . '" title="' . esc_attr( $ak_titles_for_day[ $day ] ) . "\">$day</a>";
                         $title_div = "<div>";
                             if(isset($ak_titles_for_day[$day])) { // this test should not be necessary but prevents some errors
 					foreach($ak_titles_for_day[$day] as $ak_title){
