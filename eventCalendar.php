@@ -24,6 +24,9 @@
  * @param bool $echo Optional, default is true. Set to false for return.
  * @return string|null String when retrieving, null when displaying.
  */
+
+defined('ABSPATH') or die("No script kiddies please!");
+
 function get_event_calendar($initial = true, $echo = true) {
 	global $wpdb, $m, $monthnum, $year, $wp_locale, $posts;
 
@@ -47,7 +50,7 @@ function get_event_calendar($initial = true, $echo = true) {
 
 	// Quick check. If we have no posts at all, abort!
 	if ( !$posts ) {
-		$gotsome = $wpdb->get_var("SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'tf_events' AND post_status = 'publish' LIMIT 1");
+		$gotsome = $wpdb->get_var("SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'bf_events' AND post_status = 'publish' LIMIT 1");
 		if ( !$gotsome ) {
 			$cache[ $key ] = '';
 			wp_cache_set( 'get_calendar', $cache, 'calendar' );
@@ -94,7 +97,7 @@ function get_event_calendar($initial = true, $echo = true) {
             (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%y')) AS year
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
-                WHERE  `wp_postmeta`.`meta_key` =  'tf_events_startdate'
+                WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
 		AND `wp_postmeta`.`meta_value` < UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value DESC
@@ -103,7 +106,7 @@ function get_event_calendar($initial = true, $echo = true) {
             (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%y')) AS year
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
-                WHERE  `wp_postmeta`.`meta_key` =  'tf_events_startdate'
+                WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
                 AND `wp_postmeta`.`meta_value` > UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value ASC
@@ -114,7 +117,7 @@ function get_event_calendar($initial = true, $echo = true) {
                 `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
             FROM $wpdb->postmeta wp_postmeta
             LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
-            WHERE  `wp_postmeta`.`meta_key` =  'tf_events_startdate'
+            WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
             AND  `wp_posts`.`post_status` =  'publish'
             AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
             AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")", OBJECT);
@@ -172,7 +175,7 @@ function get_event_calendar($initial = true, $echo = true) {
                     `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
-		WHERE  `wp_postmeta`.`meta_key` =  'tf_events_startdate'
+		WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
 		AND  `wp_posts`.`post_status` =  'publish'
 		AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
 		AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")", OBJECT);
@@ -185,9 +188,9 @@ function get_event_calendar($initial = true, $echo = true) {
 
                     if(empty($ak_titles_for_day[$daywith->dom])){
                             $ak_titles_for_day[$daywith->dom]= array ();
-                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=tf_events&p=".$daywith->ID);
+                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=bf_events&p=".$daywith->ID);
                     } else {
-                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=tf_events&p=".$daywith->ID);
+                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=bf_events&p=".$daywith->ID);
                     }
             }
         } else {
@@ -280,8 +283,8 @@ class Event_Calendar extends WP_Widget {
                 global $post;
                 if ( $post && ! isset( $_GET['calyear'] ) ) { // show calendar for month of this event
                     $custom = get_post_custom();
-                    $startd = $custom["tf_events_startdate"][0] + get_option( 'gmt_offset' ) * 3600;
-                    if( $custom["tf_events_startdate"][0] ) {
+                    $startd = $custom["bf_events_startdate"][0] + get_option( 'gmt_offset' ) * 3600;
+                    if( $custom["bf_events_startdate"][0] ) {
                         $startyear = date("Y", $startd );
                         $startmonth = date("m", $startd );
                         $_GET['calmonth'] = $startmonth;
