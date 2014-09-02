@@ -93,7 +93,7 @@ function get_event_calendar($initial = true, $echo = true) {
 	$last_day = date('t', $unixmonth);
 
 	// Get the next and previous month and year with at least one post
-	$previous = $wpdb->get_row("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%m')) AS month, 
+	$previous = $wpdb->get_row("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`,'%m')) AS month, 
             (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%y')) AS year
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
@@ -102,7 +102,7 @@ function get_event_calendar($initial = true, $echo = true) {
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value DESC
 			LIMIT 1");
-	$next = $wpdb->get_row("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%m')) AS month, 
+	$next = $wpdb->get_row("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`,'%m')) AS month, 
             (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%y')) AS year
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
@@ -112,7 +112,7 @@ function get_event_calendar($initial = true, $echo = true) {
 			ORDER BY wp_postmeta.meta_value ASC
 			LIMIT 1");
                 
-                
+/*                
         $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%d')) as dom , 
                 `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
             FROM $wpdb->postmeta wp_postmeta
@@ -121,7 +121,7 @@ function get_event_calendar($initial = true, $echo = true) {
             AND  `wp_posts`.`post_status` =  'publish'
             AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
             AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")", OBJECT);
-
+*/
 	/* translators: Calendar caption: 1: month name, 2: 4-digit year */
 	$calendar_caption = _x('%1$s %2$s', 'calendar caption');
         
@@ -171,7 +171,7 @@ function get_event_calendar($initial = true, $echo = true) {
 	<tr>';
 	$ak_titles_for_day = array();
         
-        $dayswithposts = $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%e')) as dom , 
+        $dayswithposts = $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`,'%e')) as dom , 
                     `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
