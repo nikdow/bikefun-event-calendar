@@ -188,9 +188,9 @@ function get_event_calendar($initial = true, $echo = true) {
 
                     if(empty($ak_titles_for_day[$daywith->dom])){
                             $ak_titles_for_day[$daywith->dom]= array ();
-                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=bf_events&p=".$daywith->ID);
+                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_permalink( $daywith->ID ) );
                     } else {
-                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_bloginfo('url') . "?post_type=bf_events&p=".$daywith->ID);
+                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_permalink( $daywith->ID ) );
                     }
             }
         } else {
