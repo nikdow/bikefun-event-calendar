@@ -326,4 +326,3 @@ function calendar_styles() {
     wp_enqueue_style('calendar-style', plugins_url( 'style.css', __FILE__ ) );
 }
 add_action( 'wp_enqueue_scripts', 'calendar_styles' );
-
