@@ -63,13 +63,17 @@ function get_event_calendar($initial = true, $echo = true) {
         
         if ( isset($_GET['calmonth']) )
                 $monthnum = ''.intval($_GET['calmonth']);
-        if ( isset($_GET['calyear']) )
+        if ( isset($_GET['calyear']) ) {
                 $year = ''.intval($_GET['calyear']);
+                if ( $year < 100 ) $year = $year + 2000;
+        }
+                
 
 	// week_begins = 0 stands for Sunday
 	$week_begins = intval(get_option('start_of_week'));
 
 	// Let's figure out when we are
+        $dt = new DateTime();
 	if ( !empty($monthnum) && !empty($year) ) {
 		$thismonth = ''.zeroise(intval($monthnum), 2);
 		$thisyear = ''.intval($year);
@@ -85,20 +89,24 @@ function get_event_calendar($initial = true, $echo = true) {
 		else
 				$thismonth = ''.zeroise(intval(substr($m, 4, 2)), 2);
 	} else {
-		$thisyear = gmdate('Y', current_time('timestamp'));
-		$thismonth = gmdate('m', current_time('timestamp'));
+                $dt->setTimezone( new DateTimeZone( get_option( 'timezone_string' ) ) );
+		$thisyear = $dt->format('Y');
+		$thismonth = $dt->format('m');
 	}
-
-	$unixmonth = mktime(0, 0 , 0, $thismonth, 1, $thisyear);
-	$last_day = date('t', $unixmonth);
-
+        $dt->setDate($thisyear, $thismonth, 1);
+        $dt->setTime(0, 0, 0);
+        
+//	$unixmonth = mktime(0, 0 , 0, $thismonth, 1, $thisyear);
+//	$last_day = date('t', $unixmonth);
+        $last_day = $dt->format('t');
+        
 	// Get the next and previous month and year with at least one post
 	$previous = $wpdb->get_row("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`,'%m')) AS month, 
             (FROM_UNIXTIME(`wp_postmeta`.`meta_value`-(" . get_option( 'gmt_offset' ) * 3600 . "),'%y')) AS year
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
                 WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
-		AND `wp_postmeta`.`meta_value` < UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
+		AND `wp_postmeta`.`meta_value` < UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value DESC
 			LIMIT 1");
@@ -107,7 +115,7 @@ function get_event_calendar($initial = true, $echo = true) {
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
                 WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
-                AND `wp_postmeta`.`meta_value` > UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
+                AND `wp_postmeta`.`meta_value` > UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value ASC
 			LIMIT 1");
@@ -126,7 +134,7 @@ function get_event_calendar($initial = true, $echo = true) {
 	$calendar_caption = _x('%1$s %2$s', 'calendar caption');
         
 	$calendar_output = '<table id="wp-calendar">
-	<caption>' . sprintf($calendar_caption, $wp_locale->get_month($thismonth), date('Y', $unixmonth)) . '</caption>
+	<caption>' . sprintf($calendar_caption, $wp_locale->get_month($thismonth), $dt->format('Y') ) . '</caption>
 	<thead>
 	<tr>';
 
@@ -177,8 +185,8 @@ function get_event_calendar($initial = true, $echo = true) {
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
 		WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
 		AND  `wp_posts`.`post_status` =  'publish'
-		AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")
-		AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) + (" . get_option( 'gmt_offset' ) * 3600 . ")", OBJECT);
+		AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")
+		AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")", OBJECT);
         if ( $dayswithposts ) {
             foreach ( $dayswithposts as $daywith ) {
 
@@ -199,11 +207,11 @@ function get_event_calendar($initial = true, $echo = true) {
 //        echo print_r($ak_titles_for_day);
 
 	// See how much we should pad in the beginning
-	$pad = calendar_week_mod(date('w', $unixmonth)-$week_begins);
+	$pad = calendar_week_mod($dt->format('w')-$week_begins);
 	if ( 0 != $pad )
 		$calendar_output .= "\n\t\t".'<td colspan="'. esc_attr($pad) .'" class="pad">&nbsp;</td>';
 
-	$daysinmonth = intval(date('t', $unixmonth));
+	$daysinmonth = intval($dt->format('t'));
 	for ( $day = 1; $day <= $daysinmonth; ++$day ) {
 		if ( isset($newrow) && $newrow )
 			$calendar_output .= "\n\t</tr>\n\t<tr>\n\t\t";
