@@ -106,7 +106,7 @@ function get_event_calendar($initial = true, $echo = true) {
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
                 WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
-		AND `wp_postmeta`.`meta_value` < UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")
+		AND `wp_postmeta`.`meta_value` < UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' )
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value DESC
 			LIMIT 1");
@@ -115,7 +115,7 @@ function get_event_calendar($initial = true, $echo = true) {
 		FROM $wpdb->postmeta wp_postmeta
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
                 WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
-                AND `wp_postmeta`.`meta_value` > UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")
+                AND `wp_postmeta`.`meta_value` > UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' )
 		AND wp_posts.post_status = 'publish'
 			ORDER BY wp_postmeta.meta_value ASC
 			LIMIT 1");
@@ -185,8 +185,8 @@ function get_event_calendar($initial = true, $echo = true) {
 		LEFT JOIN  $wpdb->posts wp_posts ON  `wp_postmeta`.`post_id` =  `wp_posts`.`ID` 
 		WHERE  `wp_postmeta`.`meta_key` =  'bf_events_startdate'
 		AND  `wp_posts`.`post_status` =  'publish'
-		AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")
-		AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' ) - (" . get_option( 'gmt_offset' ) * 3600 . ")", OBJECT);
+		AND  `wp_postmeta`.`meta_value` >= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-01 00:00:00' )
+		AND  `wp_postmeta`.`meta_value` <= UNIX_TIMESTAMP(  '{$thisyear}-{$thismonth}-{$last_day} 23:59:59' )", OBJECT);
         if ( $dayswithposts ) {
             foreach ( $dayswithposts as $daywith ) {
 
