@@ -291,15 +291,17 @@ class Event_Calendar extends WP_Widget {
                 global $post;
                 if ( $post && ! isset( $_GET['calyear'] ) ) { // show calendar for month of this event
                     $custom = get_post_custom();
-                    $startd = $custom["bf_events_startdate"][0];
-                    $startDT = new DateTime();
-                    $startDT->setTimestamp( $startd );
-                    $startDT->setTimezone( new DateTimeZone ( get_option ( 'timezone_string' ) ) );
-                    if( $custom["bf_events_startdate"][0] ) {
-                        $startyear = $startDT->format( "Y" );
-                        $startmonth = $startDT->format( "m" );
+                    if( $custom ) {
+                      $startd = $custom["bf_events_startdate"][0];
+                      $startDT = new DateTime();
+                      $startDT->setTimestamp($startd);
+                      $startDT->setTimezone(new DateTimeZone (get_option('timezone_string')));
+                      if ($custom["bf_events_startdate"][0]) {
+                        $startyear = $startDT->format("Y");
+                        $startmonth = $startDT->format("m");
                         $_GET['calmonth'] = $startmonth;
                         $_GET['calyear'] = $startyear;
+                      }
                     }
                 }
 
