@@ -178,7 +178,10 @@ function get_event_calendar($initial = true, $echo = true) {
 	<tbody>
 	<tr>';
 	$ak_titles_for_day = array();
-        
+
+  date_default_timezone_set( get_option('timezone_string') );
+  $query = $wpdb->execute( "SET time_zone = :tz", [ 'tz' => get_option('timezone_string') ] );
+  $query->execute();
         $dayswithposts = $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`,'%e')) as dom , 
                     `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
 		FROM $wpdb->postmeta wp_postmeta
@@ -190,16 +193,14 @@ function get_event_calendar($initial = true, $echo = true) {
         if ( $dayswithposts ) {
             foreach ( $dayswithposts as $daywith ) {
 
-                    $daywithpost[] = $daywith->dom;
+                $daywithpost[] = $daywith->dom;
 
-                    $post_title = esc_attr( apply_filters( 'the_title', $daywith->post_title, $daywith->post_id ) );
+                $post_title = esc_attr( apply_filters( 'the_title', $daywith->post_title, $daywith->post_id ) );
 
-                    if(empty($ak_titles_for_day[$daywith->dom])){
-                            $ak_titles_for_day[$daywith->dom]= array ();
-                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_permalink( $daywith->ID ) );
-                    } else {
-                            $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_permalink( $daywith->ID ) );
-                    }
+                if(empty($ak_titles_for_day[$daywith->dom])){
+                  $ak_titles_for_day[$daywith->dom]= array ();
+                }
+                $ak_titles_for_day[$daywith->dom][] = array('title'=>$post_title,'url'=>get_permalink( $daywith->ID ) );
             }
         } else {
             $daywithpost = array();
@@ -295,7 +296,7 @@ class Event_Calendar extends WP_Widget {
             $startd = $custom["bf_events_startdate"][0];
             $startDT = new DateTime();
             $startDT->setTimestamp($startd);
-//            $startDT->setTimezone(new DateTimeZone (get_option('timezone_string')));
+            $startDT->setTimezone(new DateTimeZone (get_option('timezone_string')));
             if ($custom["bf_events_startdate"][0]) {
               $startyear = $startDT->format("Y");
               $startmonth = $startDT->format("m");
