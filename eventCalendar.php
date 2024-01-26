@@ -295,7 +295,7 @@ class Event_Calendar extends WP_Widget {
             $startd = $custom["bf_events_startdate"][0];
             $startDT = new DateTime();
             $startDT->setTimestamp($startd);
-            $startDT->setTimezone(new DateTimeZone (get_option('timezone_string')));
+//            $startDT->setTimezone(new DateTimeZone (get_option('timezone_string')));
             if ($custom["bf_events_startdate"][0]) {
               $startyear = $startDT->format("Y");
               $startmonth = $startDT->format("m");
