@@ -180,8 +180,8 @@ function get_event_calendar($initial = true, $echo = true) {
 	$ak_titles_for_day = array();
 
   date_default_timezone_set( get_option('timezone_string') );
-  $query = $wpdb->execute( "SET time_zone = :tz", [ 'tz' => get_option('timezone_string') ] );
-  $query->execute();
+  $query = $wpdb->get_results( "SET time_zone = :tz", [ 'tz' => get_option('timezone_string') ] );
+
         $dayswithposts = $wpdb->get_results("SELECT (FROM_UNIXTIME(`wp_postmeta`.`meta_value`,'%e')) as dom , 
                     `wp_postmeta`.`post_id` , `wp_posts`.`ID` , `wp_posts`.`post_title` 
 		FROM $wpdb->postmeta wp_postmeta
